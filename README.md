@@ -74,7 +74,7 @@ see `book/` and `docs/PORT-BACK.md`.
 
 ```sh
 just build    # cargo wasm32 build -> base64 -> web/index.html
-just check    # cargo test (36, half adversarial) + clippy -D warnings + fmt
+just check    # cargo test (37, half adversarial) + clippy -D warnings + fmt
 just capture  # re-render docs/previews/*.mp4 from demo mode
 just book     # build the mdBook planning book
 ```

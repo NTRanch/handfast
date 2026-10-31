@@ -25,7 +25,7 @@ The full jam entry, playable end to end in one self-contained
 - **Deterministic Rust core** (fixed point, seeded RNG, fixed step)
   compiled to wasm32 and inlined in the page; the same core runs the
   demo mode that produced the preview videos.
-- Tests: 36 green (unit + integration, half validation / half
+- Tests: 37 green (unit + integration, half validation / half
   adversarial: separation attacks, hostile coordinates, degenerate
   timing, malformed saves, invariant fuzz). Clippy 0.1.100 clean
   under `-D warnings`; rustfmt clean.
