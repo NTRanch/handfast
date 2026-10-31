@@ -15,21 +15,21 @@ How to work this roadmap (any agent): run `bloch task start R-xxx --agent <you>`
   - evidence:
 
 ## Phase 2 — Core complete
-- [ ] R-201 Core loop is playable from start to finish
+- [~] R-201 Core loop is playable from start to finish
   - verify: cargo build
   - evidence:
-- [ ] R-202 Save and load round-trips game state
+- [~] R-202 Save and load round-trips game state
   - verify: cargo test
   - evidence:
-- [ ] R-203 Settings and accessibility options persist across sessions
+- [~] R-203 Settings and accessibility options persist across sessions
   - verify: cargo test
   - evidence:
 
 ## Phase 3 — Tests and gates
-- [ ] R-301 Validation tests cover the happy path end to end (half the test split)
+- [~] R-301 Validation tests cover the happy path end to end (half the test split)
   - verify: cargo test
   - evidence:
-- [ ] R-302 Adversarial tests cover malformed, oversized, and hostile inputs (half the test split)
+- [~] R-302 Adversarial tests cover malformed, oversized, and hostile inputs (half the test split)
   - verify: cargo test
   - evidence:
 - [ ] R-303 Structured playtest checklist is executed and its record filed
