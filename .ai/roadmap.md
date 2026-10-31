@@ -68,8 +68,9 @@ How to work this roadmap (any agent): run `bloch task start R-xxx --agent <you>`
 
 
 ## Phase 9 — Jam program (week 4, D-333)
-- [ ] R-901 Design chapter complete: mechanism group + canon core recorded
+- [x] R-901 Design chapter complete: mechanism group + canon core recorded
   - verify: test -f book/src/design.md
+  - evidence: 1 verify commands, all exit 0 at 2026-10-31T04:39:23Z
 - [ ] R-902 Engine research pinned for Rust (libraries, versions, licences)
   - verify: test -f book/src/engine-research.md
 - [ ] R-903 Single-file index.html assembles and runs offline with all screens
