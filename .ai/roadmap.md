@@ -11,15 +11,15 @@ How to work this roadmap (any agent): run `bloch task start R-xxx --agent <you>`
   - verify: cargo test
   - evidence:
 - [ ] R-103 Repo identity, baseline version, and this roadmap are recorded
-  - verify: test -f .ai/roadmap.md
+  - verify: test -f README.md && test -f CHANGELOG.md && grep -q 'version = "1.0.0"' Cargo.toml
   - evidence:
 
 ## Phase 2 — Core complete
 - [~] R-201 Core loop is playable from start to finish
-  - verify: cargo build
+  - verify: cargo test --test playthrough
   - evidence:
 - [~] R-202 Save and load round-trips game state
-  - verify: cargo test
+  - verify: cargo test save
   - evidence:
 - [~] R-203 Settings and accessibility options persist across sessions
   - verify: cargo test
@@ -33,18 +33,18 @@ How to work this roadmap (any agent): run `bloch task start R-xxx --agent <you>`
   - verify: cargo test
   - evidence:
 - [ ] R-303 Structured playtest checklist is executed and its record filed
-  - verify: cargo test
+  - verify: test -f docs/PLAYTEST.md
   - evidence:
 
 ## Phase 4 — Hardening
 - [ ] R-401 Performance budget holds on target hardware
-  - verify: cargo test
+  - verify: cargo test frame_budget
   - evidence:
 - [ ] R-402 Platform builds produce runnable artefacts
-  - verify: cargo build
+  - verify: cargo build --release --target wasm32-unknown-unknown
   - evidence:
 - [ ] R-403 Safety-critical options (stop/safeword-equivalents, accessibility) are never gated behind progression
-  - verify: cargo test
+  - verify: cargo test save
   - evidence:
 
 ## Phase 5 — Docs
@@ -60,10 +60,10 @@ How to work this roadmap (any agent): run `bloch task start R-xxx --agent <you>`
   - verify: grep -q 'version = "1.0.0"' Cargo.toml
   - evidence:
 - [ ] R-602 Clean-environment install and run is verified
-  - verify: cargo build
+  - verify: cargo build --release
   - evidence:
 - [ ] R-603 Release artefacts are built from a clean checkout and checksummed
-  - verify: cargo build
+  - verify: sha256sum -c docs/previews/SHA256SUMS
   - evidence:
 
 
@@ -74,10 +74,10 @@ How to work this roadmap (any agent): run `bloch task start R-xxx --agent <you>`
 - [ ] R-902 Engine research pinned for Rust (libraries, versions, licences)
   - verify: test -f book/src/engine-research.md
 - [ ] R-903 Single-file index.html assembles and runs offline with all screens
-  - verify: test -f web/index.html
+  - verify: node tools/build.mjs
 - [ ] R-904 GJ-07 passed: 18+ flag, warnings listed, itch ToS screen (verified live at entry)
-  - verify: test -f book/src/jam.md
+  - verify: grep -q 'I AM 18+' web/shell.html && test -f book/src/jam.md
 - [ ] R-905 Seahawk playtest pass recorded; breakage log filed
   - verify: test -f docs/BREAKAGE-LOG.md
 - [ ] R-906 Port-back note + Rust language verdict + §9 transfer filing
-  - verify: test -f book/src/port-back.md
+  - verify: test -f docs/PORT-BACK.md && test -f book/src/port-back.md

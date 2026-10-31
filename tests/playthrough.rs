@@ -145,6 +145,24 @@ fn demo_mode_wins_every_level_unattended() {
 }
 
 #[test]
+fn frame_budget_and_state_contract_hold() {
+    let mut game = Game::new(3);
+    game.start_level(2, 3);
+    let mut list = DrawList::new();
+    for _ in 0..1200 {
+        play_one_step(&mut game);
+        if game.screen != Screen::Game {
+            break;
+        }
+        list.clear();
+        game.draw(&mut list);
+        assert!(list.op_count() <= 1024, "frame exceeded the op budget");
+        assert!(!list.overflowed, "frame hit the draw-list cap");
+    }
+    assert!(game.state_line().starts_with("# screen="));
+}
+
+#[test]
 fn determinism_same_seed_same_draw_lists() {
     let mut a = Game::new_demo(1234, 1);
     let mut b = Game::new_demo(1234, 1);

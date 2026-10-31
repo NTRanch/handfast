@@ -112,8 +112,9 @@ impl Figure {
         style: Style,
         breath_rate: u32,
     ) -> Self {
-        let anchors = [-46, 0, 46];
-        let lens = [128, 150, 122];
+        // Side locks only: no strand crosses the face.
+        let anchors = [-56, -47, 54];
+        let lens = [138, 118, 130];
         let mut strands = [Strand {
             tip_x: 0,
             tip_y: 0,
@@ -126,7 +127,7 @@ impl Figure {
             strand.anchor_dx = anchors[i];
             strand.len_px = lens[i];
             strand.tip_x = px(origin_x_px + anchors[i]);
-            strand.tip_y = px(origin_y_px + HEAD_Y + 40 + lens[i]);
+            strand.tip_y = px(origin_y_px + HEAD_Y + 10 + lens[i]);
         }
         Self {
             origin_x: px(origin_x_px),
@@ -223,7 +224,7 @@ impl Figure {
         let (hx, hy) = self.head_px();
         for strand in &mut self.strands {
             let target_x = px(hx + strand.anchor_dx);
-            let target_y = px(hy + 44 + strand.len_px);
+            let target_y = px(hy + 10 + strand.len_px);
             // Spring with stiffness 1/6 and damping: the tip trails the
             // scalp by design; the lag stays inside one step at speed.
             strand.vel_x += (target_x - strand.tip_x) / 6;
@@ -262,7 +263,7 @@ impl Figure {
         list.tri(ox - 92, oy - 150, ox + 92, oy - 150, ox, oy + 4, s.cloth);
         list.circle(ox, oy - 208, 62, s.skin);
         list.circle(ox, oy - 292, chest_r, s.skin);
-        list.tri(ox - 40, oy - 330, ox + 40, oy - 330, ox, oy - 250, s.cloth);
+        list.tri(ox - 52, oy - 336, ox + 52, oy - 336, ox, oy - 258, s.cloth);
         // Resting far arm: shoulder to a hand at the hip.
         let sh_x = ox - self.facing * 62;
         let sh_y = oy - 300;
@@ -288,7 +289,7 @@ impl Figure {
         let (hx, hy) = self.head_px();
         for strand in &self.strands {
             let sx = hx + strand.anchor_dx;
-            let sy = hy + 44;
+            let sy = hy + 10;
             list.line(
                 sx,
                 sy,
