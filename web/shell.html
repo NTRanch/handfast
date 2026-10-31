@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Handfast — Nice Thoughts Ranch</title>
+<style>
+  html, body { background:#0d0208; color:#f7e8f1; font-family: system-ui, sans-serif; margin:0; padding:0; }
+  main { max-width: 92vmin; margin: 0 auto; padding: 12px; text-align: center; }
+  h1 { color:#ff2e88; font-size: 22px; letter-spacing: 3px; margin: 8px 0 2px; }
+  p.sub { color:#8a5a7d; margin: 0 0 10px; font-size: 13px; }
+  canvas { width: 92vmin; height: 92vmin; max-width: 880px; max-height: 880px; background:#0d0208;
+           border:1px solid #540e46; border-radius:8px; touch-action:none; }
+  #gate { border:1px solid #ff2e88; border-radius:8px; padding:20px; margin: 18px auto; max-width: 560px; }
+  #gate h2 { color:#ff2e88; margin-top: 0; }
+  #gate ul { text-align:left; color:#f7e8f1; font-size: 14px; line-height: 1.5; }
+  #gate button { background:#ff2e88; color:#0d0208; border:0; border-radius:6px; padding:12px 22px;
+                 font-size:16px; font-weight:700; cursor:pointer; }
+  .hidden { display:none; }
+  #status { color:#8a5a7d; font-size:12px; min-height: 16px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>HANDFAST</h1>
+  <p class="sub">Nice Thoughts Ranch · Torogao Jam Program W4 · Prima &amp; Sloane</p>
+  <div id="gate">
+    <h2>18+ only</h2>
+    <p>An adult game about a guided hand, planted contact, and a held gaze,
+    between two adult women. Content warnings:</p>
+    <ul>
+      <li>Adult themes and erotic tension (abstract staging, no explicit imagery)</li>
+      <li>Power-exchange and appraisal framing</li>
+      <li>Hypnotic/induction tone in text</li>
+    </ul>
+    <p>Nothing plays aloud until you press play yourself; sound is generated
+    in-page and can be switched off in Settings.</p>
+    <button id="enter">I AM 18+ — ENTER</button>
+  </div>
+  <canvas id="game" class="hidden" width="960" height="960"></canvas>
+  <p id="status"></p>
+</main>
+<script>
+"use strict";
+// The Rust core is inlined here by tools/build.mjs (base64 wasm).
+const WASM_B64 = "%%WASM_B64%%";
+
+// 5x7 bitmap font, identical to tools/raster.mjs so page and preview
+// videos render text the same way.
+const FONT = {
+  A: [0x7e, 0x09, 0x09, 0x09, 0x7e], B: [0x7f, 0x49, 0x49, 0x49, 0x36],
+  C: [0x3e, 0x41, 0x41, 0x41, 0x22], D: [0x7f, 0x41, 0x41, 0x22, 0x1c],
+  E: [0x7f, 0x49, 0x49, 0x49, 0x41], F: [0x7f, 0x48, 0x48, 0x48, 0x40],
+  G: [0x3e, 0x41, 0x49, 0x49, 0x2e], H: [0x7f, 0x08, 0x08, 0x08, 0x7f],
+  I: [0x41, 0x41, 0x7f, 0x41, 0x41], J: [0x02, 0x01, 0x41, 0x7e, 0x40],
+  K: [0x7f, 0x08, 0x14, 0x22, 0x41], L: [0x7f, 0x01, 0x01, 0x01, 0x01],
+  M: [0x7f, 0x20, 0x10, 0x20, 0x7f], N: [0x7f, 0x20, 0x10, 0x08, 0x7f],
+  O: [0x3e, 0x41, 0x41, 0x41, 0x3e], P: [0x7f, 0x48, 0x48, 0x48, 0x30],
+  Q: [0x3e, 0x41, 0x51, 0x62, 0x5e], R: [0x7f, 0x48, 0x4c, 0x4a, 0x39],
+  S: [0x32, 0x49, 0x49, 0x49, 0x26], T: [0x40, 0x40, 0x7f, 0x40, 0x40],
+  U: [0x7e, 0x01, 0x01, 0x01, 0x7e], V: [0x7c, 0x02, 0x01, 0x02, 0x7c],
+  W: [0x7e, 0x01, 0x0e, 0x01, 0x7e], X: [0x63, 0x14, 0x08, 0x14, 0x63],
+  Y: [0x70, 0x08, 0x07, 0x08, 0x70], Z: [0x43, 0x45, 0x49, 0x51, 0x61],
+  "0": [0x3e, 0x51, 0x49, 0x45, 0x3e], "1": [0x10, 0x30, 0x7f, 0x01, 0x01],
+  "2": [0x62, 0x51, 0x49, 0x45, 0x46], "3": [0x41, 0x49, 0x49, 0x49, 0x36],
+  "4": [0x0c, 0x14, 0x24, 0x7f, 0x04], "5": [0x72, 0x49, 0x49, 0x49, 0x31],
+  "6": [0x3e, 0x49, 0x49, 0x49, 0x26], "7": [0x60, 0x50, 0x48, 0x7f, 0x40],
+  "8": [0x36, 0x49, 0x49, 0x49, 0x36], "9": [0x30, 0x49, 0x49, 0x49, 0x3e],
+  " ": [0, 0, 0, 0, 0], ".": [0x00, 0x01, 0x01, 0x00, 0x00],
+  ",": [0x00, 0x01, 0x02, 0x00, 0x00], "!": [0x00, 0x00, 0x5f, 0x00, 0x00],
+  "?": [0x20, 0x40, 0x4d, 0x48, 0x30], "-": [0x08, 0x08, 0x08, 0x08, 0x08],
+  "+": [0x08, 0x08, 0x3e, 0x08, 0x08], ":": [0x00, 0x14, 0x00, 0x00, 0x00],
+  "'": [0x00, 0x00, 0x40, 0x00, 0x00], "/": [0x03, 0x04, 0x08, 0x10, 0x60],
+  "(": [0x00, 0x1c, 0x22, 0x41, 0x00], ")": [0x00, 0x41, 0x22, 0x1c, 0x00],
+  "&": [0x36, 0x49, 0x55, 0x22, 0x05], "%": [0x62, 0x64, 0x08, 0x13, 0x23],
+};
+
+const params = new URLSearchParams(location.search);
+const DEMO_LEVEL = params.has("demo") ? parseInt(params.get("demo"), 10) : -1;
+const SEED = params.has("seed") ? parseInt(params.get("seed"), 10) >>> 0 : 20261030;
+
+let ex = null, mem = null, palette = [];
+const input = { x: 480, y: 480, present: false, down: false, confirm: false, back: false, up: false, downKey: false };
+const keys = new Set();
+let audio = null, soundOn = true, demoIdle = 0;
+
+function bytes(ptr, len) { return new Uint8Array(mem.buffer, ptr, len).slice(); }
+function text(ptr, len) { return new TextDecoder().decode(bytes(ptr, len)); }
+
+function readPalette() {
+  const s = text(ex.hf_palette_ptr(), ex.hf_palette_len());
+  palette = JSON.parse(s);
+}
+
+function tryLoadSave() {
+  try {
+    const saved = localStorage.getItem("handfast-save");
+    if (!saved) return;
+    const buf = new TextEncoder().encode(saved);
+    const ptr = ex.hf_scratch(buf.length);
+    if (ptr === 0) return;
+    new Uint8Array(mem.buffer, ptr, buf.length).set(buf);
+    ex.hf_load(buf.length);
+  } catch (e) { /* storage is best-effort */ }
+}
+
+function persistIfDirty() {
+  if (!ex.hf_dirty()) return;
+  try {
+    const s = text(ex.hf_save_ptr(), ex.hf_save_len());
+    localStorage.setItem("handfast-save", s);
+  } catch (e) { /* ignore */ }
+  ex.hf_clear_dirty();
+}
+
+// ---- generated audio (WebAudio; only after the gate click) ----
+function tone(freqA, freqB, ms, type, gain) {
+  if (!audio || !soundOn) return;
+  const t0 = audio.currentTime;
+  const osc = audio.createOscillator();
+  const g = audio.createGain();
+  osc.type = type || "sine";
+  osc.frequency.setValueAtTime(freqA, t0);
+  osc.frequency.exponentialRampToValueAtTime(Math.max(freqB, 1), t0 + ms / 1000);
+  g.gain.setValueAtTime(gain || 0.1, t0);
+  g.gain.exponentialRampToValueAtTime(0.001, t0 + ms / 1000);
+  osc.connect(g).connect(audio.destination);
+  osc.start(t0); osc.stop(t0 + ms / 1000 + 0.02);
+}
+function playEvents(ev, screen) {
+  if (ev & 1) tone(520, 780, 140, "sine", 0.12);            // plant
+  if (ev & 2) tone(220, 110, 200, "sawtooth", 0.06);        // break
+  if (ev & 16) tone(880, 880, 90, "sine", 0.08);            // guide done
+  if (ev & 4) { tone(523, 523, 120, "sine", 0.1);           // victory arp
+    setTimeout(() => tone(659, 659, 120, "sine", 0.1), 110);
+    setTimeout(() => tone(784, 784, 200, "sine", 0.1), 220); }
+  if ((ev & 8) && screen !== "game") tone(300, 300, 40, "square", 0.03); // select
+}
+
+// ---- canvas rendering of the draw list ----
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+function drawText(x, y, size, color, str) {
+  const unit = Math.max(1, Math.round(size / 7));
+  ctx.fillStyle = color;
+  let cx = x;
+  for (const raw of String(str)) {
+    const glyph = FONT[raw.toUpperCase()] || FONT["?"];
+    for (let col = 0; col < 5; col++)
+      for (let row = 0; row < 7; row++)
+        if ((glyph[col] >> row) & 1) ctx.fillRect(cx + col * unit, y + row * unit, unit, unit);
+    cx += 6 * unit;
+  }
+}
+function render(frameText) {
+  ctx.fillStyle = palette[0] || "#0d0208";
+  ctx.fillRect(0, 0, 960, 960);
+  for (const line of frameText.split("\n")) {
+    if (!line) continue;
+    const parts = line.split(" ");
+    const kind = parts[0];
+    const n = parts.slice(1).map(Number);
+    if (kind === "r") { ctx.fillStyle = palette[n[4]]; ctx.fillRect(n[0], n[1], n[2], n[3]); }
+    else if (kind === "c") { ctx.fillStyle = palette[n[3]]; ctx.beginPath(); ctx.arc(n[0], n[1], n[2], 0, 7); ctx.fill(); }
+    else if (kind === "l") {
+      ctx.strokeStyle = palette[n[5]]; ctx.lineWidth = n[4]; ctx.lineCap = "round";
+      ctx.beginPath(); ctx.moveTo(n[0], n[1]); ctx.lineTo(n[2], n[3]); ctx.stroke();
+    } else if (kind === "p") {
+      ctx.fillStyle = palette[n[6]]; ctx.beginPath();
+      ctx.moveTo(n[0], n[1]); ctx.lineTo(n[2], n[3]); ctx.lineTo(n[4], n[5]); ctx.closePath(); ctx.fill();
+    } else if (kind === "t") {
+      const str = line.split(" ").slice(5).join(" ");
+      drawText(n[0], n[1], n[2], palette[n[3]], str);
+    }
+  }
+}
+
+function flags() {
+  let f = 0;
+  if (input.present) f |= 1;
+  if (input.down || keys.has(" ")) f |= 2;
+  if (input.confirm || keys.has("Enter")) f |= 4;
+  if (input.back) f |= 8;
+  if (input.up || keys.has("ArrowUp") || keys.has("w")) f |= 16;
+  if (input.downKey || keys.has("ArrowDown") || keys.has("s")) f |= 32;
+  return f;
+}
+
+function keyboardCursor(dt) {
+  // Arrow-key virtual pointer for gameplay when no mouse is in use.
+  const sp = 5;
+  if (keys.has("ArrowLeft") || keys.has("a")) { input.x -= sp; input.present = true; }
+  if (keys.has("ArrowRight") || keys.has("d")) { input.x += sp; input.present = true; }
+  if (keys.has("ArrowUp") || keys.has("w")) { input.y -= sp; input.present = true; }
+  if (keys.has("ArrowDown") || keys.has("s")) { input.y += sp; input.present = true; }
+  input.x = Math.max(0, Math.min(959, input.x));
+  input.y = Math.max(0, Math.min(959, input.y));
+}
+
+let lastState = "";
+function loop() {
+  keyboardCursor();
+  ex.hf_input(Math.round(input.x), Math.round(input.y), flags());
+  ex.hf_step();
+  const frame = text(ex.hf_frame_ptr(), ex.hf_frame_len());
+  render(frame);
+  lastState = text(ex.hf_state_ptr(), ex.hf_state_len());
+  const kv = {};
+  for (const part of lastState.replace(/^# /, "").split(" ")) {
+    const [k, v] = part.split("="); kv[k] = v;
+  }
+  soundOn = kv.sound === "1";
+  playEvents(parseInt(kv.ev || "0", 10), kv.screen);
+  persistIfDirty();
+  if (DEMO_LEVEL >= 0 && (kv.screen === "victory" || kv.screen === "gameover")) {
+    demoIdle++;
+    if (demoIdle === 200) { input.confirm = true; }
+    if (demoIdle > 200) { input.confirm = false; demoIdle = 0; }
+  }
+  requestAnimationFrame(loop);
+}
+
+async function boot() {
+  const raw = Uint8Array.from(atob(WASM_B64), (c) => c.charCodeAt(0));
+  const { instance } = await WebAssembly.instantiate(raw, {});
+  ex = instance.exports;
+  mem = ex.memory;
+  readPalette();
+  if (DEMO_LEVEL >= 0) ex.hf_start_demo(SEED, DEMO_LEVEL);
+  else { ex.hf_new(SEED); tryLoadSave(); }
+  requestAnimationFrame(loop);
+}
+
+document.getElementById("enter").addEventListener("click", () => {
+  document.getElementById("gate").classList.add("hidden");
+  canvas.classList.remove("hidden");
+  audio = new (window.AudioContext || window.webkitAudioContext)();
+  document.getElementById("status").textContent =
+    "Pointer guides the hand · Space presses · Esc pauses · Settings holds calm mode and the iris-glow switch";
+  boot();
+});
+
+function toLogical(evt) {
+  const r = canvas.getBoundingClientRect();
+  input.x = (evt.clientX - r.left) * 960 / r.width;
+  input.y = (evt.clientY - r.top) * 960 / r.height;
+  input.present = true;
+}
+canvas.addEventListener("pointermove", toLogical);
+canvas.addEventListener("pointerdown", (e) => { toLogical(e); input.down = true; });
+window.addEventListener("pointerup", () => { input.down = false; });
+window.addEventListener("keydown", (e) => {
+  keys.add(e.key);
+  if (e.key === "Escape" || e.key === "p" || e.key === "P") input.back = true;
+  if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " "].includes(e.key)) e.preventDefault();
+});
+window.addEventListener("keyup", (e) => {
+  keys.delete(e.key);
+  if (e.key === "Escape" || e.key === "p" || e.key === "P") input.back = false;
+});
+</script>
+</body>
+</html>
