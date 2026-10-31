@@ -1,0 +1,17 @@
+[package]
+name = "handfast"
+version = "0.1.0"
+edition = "2024"
+license = "LicenseRef-NTRanch-ARR"
+description = "Handfast — Torogao jam program entry (Nice Thoughts Ranch)"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+# Preflight: pin the wasm + rendering stack chosen by the engine research
+# (book: engine-research chapter). Nothing speculative lands here early.
+
+[profile.release]
+opt-level = "s"
+lto = true
