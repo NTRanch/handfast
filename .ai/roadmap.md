@@ -4,10 +4,10 @@
 How to work this roadmap (any agent): run `bloch task start R-xxx --agent <you>` before working a task, `bloch task done R-xxx` when you believe it is complete — done runs every `verify:` command and flips the task green only if all pass; there is no override. `bloch task fail R-xxx --error "..."` records a failure. Fixes learned the hard way land in `.ai/memory/lessons.md` via the inbox/promote flow and are surfaced in every HANDOFF.
 
 ## Phase 1 — Baseline truth
-- [ ] R-101 Build is green from a clean checkout
+- [~] R-101 Build is green from a clean checkout
   - verify: cargo build
   - evidence:
-- [ ] R-102 Existing tests pass at the baseline
+- [~] R-102 Existing tests pass at the baseline
   - verify: cargo test
   - evidence:
 - [ ] R-103 Repo identity, baseline version, and this roadmap are recorded
