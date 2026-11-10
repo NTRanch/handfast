@@ -14,7 +14,7 @@ All characters depicted are adults.
 
 ## A two-character touch game where you guide Prima's hand onto Sloane's body and keep contact while you hold her gaze.
 
-<p align="center"><a href="https://github.com/NTRanch/handfast">GitHub</a> · <a href="https://github.com/NTRanch/handfast/blob/main/LICENSE.md">License</a> · <a href="https://ntranch.itch.io">itch.io studio page</a></p>
+<p align="center"><a href="https://github.com/NTRanch/handfast">GitHub</a> · <a href="https://github.com/NTRanch/handfast/blob/main/LICENSE.md">License</a> · <a href="https://ntranch.itch.io">itch.io studio page</a> · <a href="https://github.com/NTRanch/handfast/releases/tag/v1.0.0">Release</a></p>
 
 ![Handfast header](../assets/brand/header.png)
 
